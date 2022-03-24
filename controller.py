@@ -25,5 +25,6 @@ class MancalaController:
     
     def get_num_pits(self):
         return self.model.get_num_pits()
-        
 
+controller = MancalaController(2, 8)  
+controller.play()

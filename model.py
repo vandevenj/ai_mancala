@@ -15,8 +15,36 @@ class MancalaModel:
         for i in range(0, self.num_players):
             self.board.append([num_beans / num_pits / self.num_players] * (num_pits))
             self.board[i].append(0)
-    
 
+    def get_current_board(self):
+        #TODO immutability?
+        return self.board
+
+    def get_num_pits(self):
+        #TODO immutability?
+        return self.num_pits
+    
+    def is_empty_pit(self, player_id, pit_id):
+        return self.board[player_id][pit_id] == 0
+
+    def is_game_over(self):
+        game_over = False
+        for player in range(0, len(self.board)):
+            game_over =  game_over or all(pit == 0 for pit in self.board[player][0:-1])
+
+        if game_over:
+            for player in  range(0, len(self.board)):
+                for pit in range(0, self.num_pits):
+                    self.board[player][self.num_pits] += self.board[player][pit] 
+                    self.board[player][pit] = 0
+            return True
+            #### score post empty side:
+            # get beans on your side of the board
+
+    def who_wins(self):
+        zero = self.board[0][self.num_pits] > self.board[1][self.num_pits]
+        one = self.board[1][self.num_pits] > self.board[0][self.num_pits]
+        return 0 if zero else 1 if one else -1
 
     def next_player(self, player_id):
         return (player_id + 1) % self.num_players
@@ -27,8 +55,10 @@ class MancalaModel:
         another_turn = False
         # if pit has any beans in it
         num_beans_to_move = self.board[player_id][pit_to_move]
+        self.board[player_id][pit_to_move] = 0
         curr_pit = pit_to_move
         curr_player = player_id
+
         while num_beans_to_move > 0:
             
             curr_pit += 1
@@ -36,7 +66,7 @@ class MancalaModel:
             # if curr_pit is score pit, end of player's board, reset to start of next player's board
             if self.num_pits == curr_pit:
                 # only increment beans in current turn's player's score pit
-                if curr_player == self.player_id:
+                if curr_player == player_id:
                     # increment beans in pit
                     self.board[curr_player][curr_pit] += 1
                     num_beans_to_move -= 1
