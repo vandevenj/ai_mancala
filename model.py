@@ -13,6 +13,7 @@ class MancalaModel:
         self.player_turn = 0
         self.board = []
         for i in range(0, self.num_players):
+            # TODO - weird bean number logic, needs to be verified
             self.board.append([num_beans / num_pits / self.num_players] * (num_pits))
             self.board[i].append(0)
 
@@ -21,7 +22,6 @@ class MancalaModel:
         return self.board
 
     def get_num_pits(self):
-        #TODO immutability?
         return self.num_pits
     
     def is_empty_pit(self, player_id, pit_id):
@@ -38,8 +38,7 @@ class MancalaModel:
                     self.board[player][self.num_pits] += self.board[player][pit] 
                     self.board[player][pit] = 0
             return True
-            #### score post empty side:
-            # get beans on your side of the board
+        return False
 
     def who_wins(self):
         zero = self.board[0][self.num_pits] > self.board[1][self.num_pits]
