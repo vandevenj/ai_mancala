@@ -66,5 +66,5 @@ class MancalaView:
         else: 
             print(f"PLAYER {winner} wins!")
 
-mancala = MancalaView(4, 8)  
+mancala = MancalaView(4, 16)  
 mancala.play()

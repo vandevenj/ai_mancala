@@ -1,4 +1,4 @@
-
+import copy
 
 class MancalaModel:
     def __init__(self, num_pits, num_beans):
@@ -13,13 +13,13 @@ class MancalaModel:
         self.player_turn = 0
         self.board = []
         for i in range(0, self.num_players):
-            # TODO - weird bean number logic, needs to be verified
+            # TODO - weird bean number logic, needs to be verified -- off by ones?
             self.board.append([num_beans / num_pits / self.num_players] * (num_pits))
             self.board[i].append(0)
 
     def get_current_board(self):
-        #TODO immutability?
-        return self.board
+        # produces copy of game board 
+        return copy.deepcopy(self.board)
 
     def get_num_pits(self):
         return self.num_pits
@@ -41,8 +41,12 @@ class MancalaModel:
         return False
 
     def who_wins(self):
+        # Note: hardcoded for two players
+        # check if player zero wins
         zero = self.board[0][self.num_pits] > self.board[1][self.num_pits]
+        # check if player one wins
         one = self.board[1][self.num_pits] > self.board[0][self.num_pits]
+        # if neither win then tie
         return 0 if zero else 1 if one else -1
 
     def next_player(self, player_id):
@@ -79,19 +83,20 @@ class MancalaModel:
                 # increment beans in pit
                 self.board[curr_player][curr_pit] += 1
                 num_beans_to_move -= 1
+                # if the last bean is put into an empty pit on the current turn player's board, steal from corresponding opponent's pit
                 if num_beans_to_move == 0 and curr_player == self.player_turn and self.board[curr_player][curr_pit] == 1:
                     self.snatch_unguarded_pit(curr_player, curr_pit) 
         if not another_turn:
             self.player_turn = self.next_player(player_id)
     
     def snatch_unguarded_pit(self, curr_player, curr_pit):
-        # check pit unguarded?
-        # empty opponent's pit
-        # add pit to player's score pit
-        unguarded_pit = self.num_pits - curr_pit - 1 #TODO - check accuracy
-        
+        # get unguarded pit
+        unguarded_pit = self.num_pits - curr_pit - 1 #TODO - check accuracy of which pit is being snatched
+        # empty current pit
         self.board[curr_player][curr_pit] -= 1 #should be 0 after this
+        # add opponent unguarded pit to player's score pit
         self.board[curr_player][self.num_pits] += 1 + self.board[self.next_player(curr_player)][unguarded_pit]
+        # empty oppoinent's pit
         self.board[self.next_player(curr_player)][unguarded_pit] = 0
 
 
