@@ -17,13 +17,24 @@ class MancalaModel:
             self.board.append([num_beans / num_pits / self.num_players] * (num_pits))
             self.board[i].append(0)
 
+    # Gets the current board as a 2d array 
     def get_current_board(self):
         # produces copy of game board 
         return copy.deepcopy(self.board)
 
+    # gets the number of players
+    def get_num_players(self):
+        return self.num_players
+
+    # Gets the player Id whose turn it is 
+    def get_player_turn(self):
+        return self.player_turn
+
+    # Gets the number of pits on each side 
     def get_num_pits(self):
         return self.num_pits
     
+    # Determines if the pit at the current indexes is empty 
     def is_empty_pit(self, player_id, pit_id):
         return self.board[player_id][pit_id] == 0
 
@@ -49,9 +60,31 @@ class MancalaModel:
         # if neither win then tie
         return 0 if zero else 1 if one else -1
 
+    # Returns a 2-item list of the scores
+    def get_scores(self):
+        scores = []
+        for player in range(self.num_players):
+            scores.append(self.board[player][self.num_pits])
+
+    # Gets the number of the next player to move 
     def next_player(self, player_id):
         return (player_id + 1) % self.num_players
+
+    # gets the legal actions on a player's side 
+    def get_legal_actions(self, player):
+        player_side = self.board[player]
+        result = []
+        for i in range(self.num_pits - 1):
+            if self.is_legal_move(player, i):
+                result.apped(i)
+        return result
+        
+    # returns true if the move is not on an empty space or the goal space 
+    def is_legal_move(self, player, index):
+        return not (self.is_empty_pit(player, index) or self.get_num_pits() == index)
+
     
+    # performs a player move 
     def player_move(self, player_id, pit_to_move):
         if player_id != self.player_turn:
             raise Exception(f"Player {player_id} tried to move when it is player {self.player_turn}'s turn")
@@ -88,7 +121,14 @@ class MancalaModel:
                     self.snatch_unguarded_pit(curr_player, curr_pit) 
         if not another_turn:
             self.player_turn = self.next_player(player_id)
+
+    # Returns a representation of the model after performing the specified move (without mutating the original)
+    def generate_successor(self, player_id, pit_to_move):
+        successor = copy.deepcopy(self)
+        successor.player_move(player_id, pit_to_move)
+        return successor
     
+    # Stealing!! 
     def snatch_unguarded_pit(self, curr_player, curr_pit):
         # get unguarded pit
         unguarded_pit = self.num_pits - curr_pit - 1 #TODO - check accuracy of which pit is being snatched

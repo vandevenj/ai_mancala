@@ -5,8 +5,8 @@ from model import MancalaModel
 
 class MancalaView:
 
-    def __init__(self, num_pits, num_beans):
-        self.model = MancalaModel(num_pits, num_beans)
+    def __init__(self, model):
+        self.model = model
 
     def display(self):
         # NOTE currently hardcoded for two players; last pit is score pit
@@ -66,5 +66,5 @@ class MancalaView:
         else: 
             print(f"PLAYER {winner} wins!")
 
-mancala = MancalaView(4, 16)  
+mancala = MancalaView(MancalaModel(4, 16))  
 mancala.play()
