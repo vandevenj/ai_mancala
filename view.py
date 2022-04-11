@@ -47,10 +47,8 @@ class MancalaView:
             else:
                 return pit_to_move
 
-    
     def is_game_over(self):
         return self.model.is_game_over()
-        
 
     def play(self):
         # Entrypoint of Mancala
@@ -66,5 +64,6 @@ class MancalaView:
         else: 
             print(f"PLAYER {winner} wins!")
 
-mancala = MancalaView(MancalaModel(4, 16))  
-mancala.play()
+if __name__ == "__main__":
+    mancala = MancalaView(MancalaModel(4, 16))  
+    mancala.play()

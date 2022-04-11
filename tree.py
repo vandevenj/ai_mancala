@@ -1,6 +1,13 @@
 
+import copy
 
 class Tree:
+    """
+    Data structure to hold the game decision tree,
+    with each node holding its game state (model), 
+    its next possible states resulting from actions (children),
+    and the best move from the node's state.
+    """
 
     def __init__(self, model):
         self.model = model
@@ -8,7 +15,10 @@ class Tree:
         self.best_move = -1
 
     def get_children(self):
-        return self.children
+        """
+        Returns a copy of the children from this game tree node.
+        """
+        return copy.deepcopy(self.children)
     
     def add_child(self, child):
         self.children.append(child)
