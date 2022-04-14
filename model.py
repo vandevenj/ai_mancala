@@ -118,6 +118,7 @@ class MancalaModel:
         scores = []
         for player in range(self.num_players):
             scores.append(self.board[player][self.num_pits])
+        return scores
 
     # ----------------------------------------------------------------------------------------------  #
     # NOTE: MiniMax-related functions below this line! Everything above needed for Standard Mancala.
@@ -142,6 +143,40 @@ class MancalaModel:
         successor = copy.deepcopy(self)
         successor.player_move(player_id, pit_to_move)
         return successor
+
+    def to_string(self):
+         # NOTE currently hardcoded for two players; last pit is score pit
+        board = self.get_current_board()
+        num_pits = self.get_num_pits()
+        player = board[1]
+        output = "\n|"
+        pit = num_pits
+        while pit >= 0:
+            # score pit
+            if pit == num_pits:
+                output += f" [{player[pit]}] |"
+            # movable pit
+            else:
+                output += f" {player[pit]} |"
+            pit -= 1
+            
+        # user, b
+        player = board[0]
+        output += f"\n|"
+        for pit in range(0, len(player)):
+            # score pit
+            if pit == num_pits:
+                output += f" [{player[pit]}] |"
+            # movable pit
+            else:
+                output += f" {player[pit]} |"
+        return output
+
+    def __hash__(self) -> int:
+        return hash(self.to_string())
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.board == other.board and self.player_turn == other.player_turn
     
 
 

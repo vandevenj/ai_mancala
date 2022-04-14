@@ -9,31 +9,7 @@ class MancalaView:
         self.model = model
 
     def display(self):
-        # NOTE currently hardcoded for two players; last pit is score pit
-        board = self.model.get_current_board()
-        num_pits = self.model.get_num_pits()
-        player = board[1]
-        output = "\n|"
-        pit = num_pits
-        while pit >= 0:
-            # score pit
-            if pit == num_pits:
-                output += f" [{player[pit]}] |"
-            # movable pit
-            else:
-                output += f" {player[pit]} |"
-            pit -= 1
-            
-        # user, b
-        player = board[0]
-        output += f"\n|"
-        for pit in range(0, len(player)):
-            # score pit
-            if pit == num_pits:
-                output += f" [{player[pit]}] |"
-            # movable pit
-            else:
-                output += f" {player[pit]} |"
+        output = self.model.to_string()
         print(output)
 
     def choose_valid_pit(self, player_id):

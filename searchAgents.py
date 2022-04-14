@@ -1,83 +1,104 @@
 
-
+from operator import mod
 from model import MancalaModel
 from view import MancalaView
-from tree import Tree
+import copy
 
 
 class MiniMax:
-    """
-    MiniMax AI implementation.
-    """
 
-    def __init__(self, model, player_num, depth):
+    def __init__(self, player_num, depth):
         # TODO
-        self.model = model
-        self.current_player = 0 # Current moving player 
         self.player_num = player_num # What number the agent is 
-        self.depth = depth # the depth to execute minimax until, all nodes at this depth treated as terminal
-        self.tree = Tree(model) # the game state tree
+        self.depth = depth
+        self.action_dict = {} # dict <State, action>
+
 
     def getAction(self, gameState):
+        if gameState in self.action_dict.keys() and not (self.action_dict[gameState] == -1) :
+            return self.action_dict[gameState]
+        else:
+            self.action_dict = {} # dump previous as we have most likely reached the previous depth
+            self.computeActions(gameState)
+            return self.getAction(gameState) # Should not infinitely recur 
+
+
+
+    def computeActions(self, gameState):
         """
-        Returns the minimax action from the current state of the game
+        Computes the actions up until self.depth. 
         """
-        actions = {}
-        legal = gameState.get_legal_actions(self.current_player) 
-        for action in legal:
-            successor = gameState.generate_successor(self.current_player, action)
-            self.tree.add_child(Tree(successor))
-            actions[action] = self.value(successor, self.model.next_player(self.current_player), self.depth)
-            
-        # print(actions)
-        best = max(actions, key=actions.get)
-        print("Chose action: " + str(best) + " with a score of " + str(actions[best]))
+        "*** YOUR CODE HERE ***"
+        if self.player_num == gameState.get_player_turn():
+            self.maxValue(gameState, self.depth)
+        else:
+            self.minValue(gameState, self.depth)
         
-        self.tree.set_best_move(best)
-        return best
-        
-    def maxValue(self, gameState, index, depth):
-        #print("Getting max move value for index: " + str(index))
+
+    # Now stores what the best option is in the given gameState
+    def maxValue(self, gameState, depth):
         v = -1000000000000
+        maxAction = -1 
         if depth <= 0:
+            self.action_dict[gameState] = maxAction
             return self.evaluationFunction(gameState)
-        nextIndex = (index + 1) % gameState.get_num_players()
-        for action in gameState.get_legal_actions(index):
-            v = max(v, self.value(gameState.generate_successor(index, action), nextIndex, depth))
+        nextIndex = gameState.get_player_turn()
+        print(f"Max: nextIndex: {nextIndex}")
+        for action in gameState.get_legal_actions(nextIndex):
+            action_val = self.value(gameState.generate_successor(nextIndex, action), depth)
+            if action_val > v:
+                maxAction = action
+                v = action_val
+        self.action_dict[gameState] = maxAction
         return v
 
-    def minValue(self, gameState, index, depth):
+
+    
+    def minValue(self, gameState, depth):
         v = 1000000000000
-        nextIndex = (index + 1) % gameState.get_num_players()
-        for action in gameState.get_legal_actions(index):
-            v = min(v, self.value(gameState.generate_successor(index, action), nextIndex, depth))
+        nextIndex = gameState.get_player_turn()
+        print(f"Min: nextIndex: {nextIndex}")
+        for action in gameState.get_legal_actions(nextIndex):
+            v = min(v, self.value(gameState.generate_successor(nextIndex, action), depth))
         return v
 
-    def value(self, gameState, index, depth, tree):
-        child = Tree(gameState)
+
+    def value(self, gameState, depth):
+        nextIndex = gameState.get_player_turn()
         if gameState.is_game_over():
             score = self.evaluationFunction(gameState)
+            self.action_dict[gameState] = -1 # No action needed 
             return score
-        elif index == self.player_num:
-            # if its the player's turn
-            return self.maxValue(gameState, index, depth - 1)
-        else:       
-            # if its the CPU's turn
-            return self.minValue(gameState, index, depth)
+        elif nextIndex == self.player_num:
+            return self.maxValue(gameState, depth - 1)
+        else:            # Ghost turn
+            return self.minValue(gameState, depth)
 
     # Evaluates the current game state 
     def evaluationFunction(self, state):
         scores = state.get_scores()
         return scores[self.player_num] - scores[1 if self.player_num == 0 else 0]
+    
+
 
 
 def play_minimax():
-    model = MancalaModel(4, 8)
+    model = MancalaModel(2, 8)
     view = MancalaView(model)
-    agent = MiniMax(model, 1, 4)
+    agent = MiniMax(1, 4)
 
-    action = agent.getAction(model)
+    while not model.is_game_over():
+        print(model.to_string())
+        turn = model.get_player_turn()
+        print(f"Player turn: {turn}")
+        if turn == 0: # our turn 
+            move = int(input())
+        else:
+            move = agent.getAction(model)
+        print(f"Player turn: {turn}")
+        model.player_move(turn, move)
     
+        
     winner = view.model.who_wins()
     if winner == -1:
         print(f"TIE!")
@@ -85,5 +106,12 @@ def play_minimax():
         print(f"PLAYER {winner} wins!")
 
 
-if __name__ == "__main__":
-    play_minimax()
+play_minimax()
+
+# agent1 = MiniMax(0, 4)
+# agent2 = MiniMax(1, 4)
+# model = MancalaModel(4, 8)
+# move = agent1.getAction(model)
+# print(move)
+# model.player_move(0, agent1.getAction(model))
+# model.player_move(1, agent2.getAction(model))
