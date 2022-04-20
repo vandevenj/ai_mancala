@@ -29,10 +29,13 @@ class MiniMax:
         Computes the actions up until self.depth. 
         """
         "*** YOUR CODE HERE ***"
-        if self.player_num == gameState.get_player_turn():
-            self.maxValue(gameState, self.depth)
+        if gameState.is_game_over():
+            print("Game is over!")
         else:
-            self.minValue(gameState, self.depth)
+            if self.player_num == gameState.get_player_turn():
+                self.maxValue(gameState, self.depth)
+            else:
+                self.minValue(gameState, self.depth)
         
 
     # Now stores what the best option is in the given gameState
@@ -44,6 +47,8 @@ class MiniMax:
             return self.evaluationFunction(gameState)
         nextIndex = gameState.get_player_turn()
         print(f"Max: nextIndex: {nextIndex}")
+        #print(gameState.is_game_over())
+        #print(len(gameState.get_legal_actions(nextIndex)))
         for action in gameState.get_legal_actions(nextIndex):
             action_val = self.value(gameState.generate_successor(nextIndex, action), depth)
             if action_val > v:
@@ -65,6 +70,7 @@ class MiniMax:
 
     def value(self, gameState, depth):
         nextIndex = gameState.get_player_turn()
+        print(gameState.to_string())
         if gameState.is_game_over():
             score = self.evaluationFunction(gameState)
             self.action_dict[gameState] = -1 # No action needed 
@@ -76,25 +82,43 @@ class MiniMax:
 
     # Evaluates the current game state 
     def evaluationFunction(self, state):
+        value = 0
+        player_side = state.board[self.player_num]
+        for pit_index in range(len(player_side)):
+            pit_val = player_side[pit_index] 
+            if pit_index == state.num_pits: continue # don't care about score pit 
+            if pit_val == state.num_pits - pit_index: # Has move chain TODO: incorporate value from subsequent move 
+                value += 5 
+            if pit_val >= state.num_pits - pit_index: # has moves that can score 
+                value += 1
+                
+            # TODO: stealing
+            # TODO: defense 
         scores = state.get_scores()
-        return scores[self.player_num] - scores[1 if self.player_num == 0 else 0]
+        score_diffs = scores[self.player_num] - scores[1 if self.player_num == 0 else 0]
+        value += score_diffs
+        print("***Begin Eval***")
+        print(state.to_string())
+        print(f"Player: {self.player_num}, Value: {value}")
+        print("***End Eval***")
+        return value
     
 
 
 
 def play_minimax():
-    model = MancalaModel(2, 8)
+    model = MancalaModel(3, 12)
     view = MancalaView(model)
-    agent = MiniMax(1, 4)
-
+    agent0 = MiniMax(0, 3)
+    agent1 = MiniMax(1, 3)
     while not model.is_game_over():
         print(model.to_string())
         turn = model.get_player_turn()
         print(f"Player turn: {turn}")
         if turn == 0: # our turn 
-            move = int(input())
+            move = agent0.getAction(model)
         else:
-            move = agent.getAction(model)
+            move = agent1.getAction(model)
         print(f"Player turn: {turn}")
         model.player_move(turn, move)
     

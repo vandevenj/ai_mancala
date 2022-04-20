@@ -9,7 +9,7 @@ class MancalaModel:
         self.num_beans = num_beans
         if num_pits <= 0:
             raise Exception("Number of pits on the board must be greater than 0")
-        self.num_pits = num_pits
+        self.num_pits = num_pits # score pit numbr 
         self.player_turn = 0
         self.board = []
         for i in range(0, self.num_players):
@@ -43,9 +43,9 @@ class MancalaModel:
         return (player_id + 1) % self.num_players
 
     def is_game_over(self):
-        game_over = False
-        for player in range(0, len(self.board)):
-            game_over =  game_over or all(pit == 0 for pit in self.board[player][0:-1])
+        p1_actions = self.get_legal_actions(0)
+        p2_actions = self.get_legal_actions(1)
+        game_over = len(p1_actions) == 0 or len(p2_actions) == 0
 
         if game_over:
             for player in  range(0, len(self.board)):
@@ -97,7 +97,8 @@ class MancalaModel:
                     # increment beans in pit
                     self.board[curr_player][curr_pit] += 1
                     num_beans_to_move -= 1
-                    if num_beans_to_move == 0:
+                    if num_beans_to_move == 0 and not self.is_game_over():
+                        print(self.to_string())
                         another_turn = True
 
                 curr_pit = -1
