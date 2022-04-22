@@ -14,7 +14,7 @@ class MancalaModel:
         self.board = []
         for i in range(0, self.num_players):
             # TODO - weird bean number logic, needs to be verified -- off by ones?
-            self.board.append([num_beans / num_pits / self.num_players] * (num_pits))
+            self.board.append([int(num_beans / num_pits / self.num_players)] * (num_pits))
             self.board[i].append(0)
 
     # Gets the current board as a 2d array 
@@ -98,7 +98,7 @@ class MancalaModel:
                     self.board[curr_player][curr_pit] += 1
                     num_beans_to_move -= 1
                     if num_beans_to_move == 0 and not self.is_game_over():
-                        print(self.to_string())
+                        # print(self.to_string())
                         another_turn = True
 
                 curr_pit = -1
@@ -129,7 +129,7 @@ class MancalaModel:
     def get_legal_actions(self, player):
         player_side = self.board[player]
         result = []
-        for i in range(self.num_pits - 1):
+        for i in range(self.num_pits):
             if self.is_legal_move(player, i):
                 result.append(i)
         return result
@@ -155,24 +155,25 @@ class MancalaModel:
         while pit >= 0:
             # score pit
             if pit == num_pits:
-                output += f" [{player[pit]}] |"
+                output += f"[{player[pit]:02}]|"
             # movable pit
             else:
-                output += f" {player[pit]} |"
+                output += f"{player[pit]:02}|"
             pit -= 1
             
         # user, b
         player = board[0]
-        output += f"\n|"
+        output += f"\n     |"
         for pit in range(0, len(player)):
             # score pit
             if pit == num_pits:
-                output += f" [{player[pit]}] |"
+                output += f"[{player[pit]:02}]|"
             # movable pit
             else:
-                output += f" {player[pit]} |"
+                output += f"{player[pit]:02}|"
         return output
 
+    #Necessary for using as dict keys 
     def __hash__(self) -> int:
         return hash(self.to_string())
 
