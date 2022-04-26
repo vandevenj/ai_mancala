@@ -82,7 +82,7 @@ class AlphaBetaAgent:
         if gameState.is_game_over():
             score = self.evaluationFunction(gameState, index)
             return score
-        elif index == 0: # Player 0 turn
+        elif index == self.player_num: # Player 0 turn
             v = self.maxValue(gameState, depth - 1, alpha, beta)
             return v
         else:            # Player 1 turn
@@ -92,28 +92,23 @@ class AlphaBetaAgent:
 
      # Evaluates the current game state 
     def evaluationFunction(self, state, turn):
-        discount = 0.2
         factor = state.get_num_pits()
         value = 0
-        best_chain = 0
         player_side = state.board[turn]
         for pit_index in range(len(player_side)):
             pit_val = player_side[pit_index] 
             if pit_index == state.num_pits: continue # don't care about score pit 
-            if pit_val == state.num_pits - pit_index: # Has move chain TODO: incorporate value from subsequent move 
-                best_chain = max(discount * self.evaluationFunction(state.generate_successor(turn, pit_index), turn), best_chain) 
+            # if pit_val == state.num_pits - pit_index: # Has move chain TODO: incorporate value from subsequent move 
+            #     value += factor / 2
             if pit_val >= state.num_pits - pit_index: # has moves that can score 
-                value += 1
-                
-            # TODO: stealing
-            # TODO: defense 
+                value += 1 
         scores = state.get_scores()
         score_diffs = scores[turn] - scores[1 if turn == 0 else 0]
         # print("***Begin Eval***")
         # print(state.to_string())
         # print(f"Player: {self.player_num}, Value: {value}")
         # print("***End Eval***")
-        return value + best_chain + 3 * score_diffs
+        return  value + (3 * score_diffs)
 
 
 def play_abpruning():
@@ -140,6 +135,7 @@ def play_abpruning():
         print(f"TIE!")
     else: 
         print(f"PLAYER {winner} wins!")
+        print(model.to_string())
 
 
 # model = MancalaModel(6, 48)
@@ -162,4 +158,4 @@ def play_abpruning():
 # print(model.to_string())
 # print(model.get_scores())
 # print(AlphaBetaAgent(1, 3).evaluationFunction(model, 1))
-play_abpruning()
+#play_abpruning()

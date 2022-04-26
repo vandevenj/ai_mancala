@@ -99,7 +99,7 @@ class MiniMax:
         # print(state.to_string())
         # print(f"Player: {self.player_num}, Value: {value}")
         # print("***End Eval***")
-        return value
+        return score_diffs 
     
 
 

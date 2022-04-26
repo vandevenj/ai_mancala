@@ -1,3 +1,4 @@
+from cgi import test
 import copy
 
 class MancalaModel:
@@ -40,7 +41,7 @@ class MancalaModel:
 
     # Gets the number of the next player to move 
     def next_player(self, player_id):
-        return (player_id + 1) % self.num_players
+        return 1 - player_id # Hard coded to 2 players
 
     def is_game_over(self):
         p1_actions = self.get_legal_actions(0)
@@ -108,8 +109,8 @@ class MancalaModel:
                 # increment beans in pit
                 self.board[curr_player][curr_pit] += 1
                 num_beans_to_move -= 1
-                # if the last bean is put into an empty pit on the current turn player's board, steal from corresponding opponent's pit
-                if num_beans_to_move == 0 and curr_player == self.player_turn and self.board[curr_player][curr_pit] == 1:
+                # if the last bean is put into an empty pit on the current turn player's board and opposite space is not empty, steal from corresponding opponent's pit
+                if num_beans_to_move == 0 and curr_player == self.player_turn and self.board[curr_player][curr_pit] == 1 and not self.board[1 - curr_player][self.num_pits - 1 - curr_pit] == 0:
                     self.snatch_unguarded_pit(curr_player, curr_pit) 
         if not another_turn:
             self.player_turn = self.next_player(player_id)

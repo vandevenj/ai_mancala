@@ -1,7 +1,7 @@
 
-from inspect import indentsize
 from model import MancalaModel
 from view import MancalaView
+from abpruning import AlphaBetaAgent
 
 class MancalaDT:
 
@@ -113,12 +113,11 @@ class MancalaDT:
         
 
 
-
 def play_dt():
     model = MancalaModel(6, 48)
     view = MancalaView(model)
     agent0 = MancalaDT(0)
-    agent1 = MancalaDT(1)
+    agent1 = AlphaBetaAgent(1, 2)#MancalaDT(1)
     while not model.is_game_over():
         print(model.to_string())
         turn = model.get_player_turn()
@@ -137,6 +136,7 @@ def play_dt():
         print(f"TIE!")
     else: 
         print(f"PLAYER {winner} wins!")
+        print(model.to_string())
 
 
 play_dt()
